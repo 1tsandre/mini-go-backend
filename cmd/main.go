@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/1tsandre/mini-go-backend/internal/config"
+	"github.com/1tsandre/mini-go-backend/internal/repositories/database/postgres"
 )
 
 func main() {
 	cfg := config.LoadConfig()
-	fmt.Println(cfg)
+
+	db := postgres.NewPostgresConnection(cfg)
+	defer db.Close()
 }
