@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/1tsandre/mini-go-backend/internal/config"
-	"github.com/1tsandre/mini-go-backend/internal/repositories/database/postgres"
 	"github.com/1tsandre/mini-go-backend/internal/repositories/cacher/redis"
+	"github.com/1tsandre/mini-go-backend/internal/repositories/database/postgres"
 )
 
 func main() {
@@ -13,5 +13,5 @@ func main() {
 	defer db.Close()
 
 	rdb := redis.NewRedisClient(cfg)
-    defer rdb.Close()
+	defer rdb.Close()
 }
