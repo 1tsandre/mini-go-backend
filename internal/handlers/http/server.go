@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/go-chi/chi/v5"
 )
 
 type Server struct {
@@ -30,9 +28,4 @@ func (s *Server) Start() error {
 
 func (s *Server) Shutdown(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)
-}
-
-func NewRouter() *chi.Mux {
-	r := chi.NewRouter()
-	return r
 }
