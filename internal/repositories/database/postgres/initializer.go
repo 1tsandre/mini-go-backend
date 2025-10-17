@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/1tsandre/mini-go-backend/internal/config"
@@ -23,6 +24,11 @@ func New(cfg *config.Config) (*sql.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open PostgreSQL: %w", err)
 	}
+
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxIdleTime(5 * time.Minute)
+	db.SetConnMaxLifetime(1 * time.Hour)
 
 	if err := db.Ping(); err != nil {
 		db.Close()
