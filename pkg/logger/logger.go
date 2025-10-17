@@ -4,76 +4,45 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
-const (
-	colorInfo  = "\033[32m"
-	colorError = "\033[31m"
-	colorDebug = "\033[36m"
-	colorFatal = "\033[35m"
-	colorReset = "\033[0m"
-)
+func init() {
+	log.SetFlags(0)
+	log.SetOutput(os.Stdout)
+}
 
-func logWithLevel(level string, format string, args ...interface{}) {
-	pc1, _, _, ok1 := runtime.Caller(2)
-	pc2, _, _, ok2 := runtime.Caller(3)
+func format(level, message string) string {
+	pc1, _, _, ok1 := runtime.Caller(3)
+	pc2, _, _, ok2 := runtime.Caller(4)
 
-	func1, func2 := "???", "???"
-
+	fn1, fn2 := "unknown", "unknown"
 	if ok1 {
-		if fn := runtime.FuncForPC(pc1); fn != nil {
-			func1 = shortFuncName(fn.Name())
-		}
+		fn := runtime.FuncForPC(pc1)
+		parts := strings.Split(fn.Name(), "/")
+		fn1 = parts[len(parts)-1]
 	}
-
 	if ok2 {
-		if fn := runtime.FuncForPC(pc2); fn != nil {
-			func2 = shortFuncName(fn.Name())
-		}
+		fn := runtime.FuncForPC(pc2)
+		parts := strings.Split(fn.Name(), "/")
+		fn2 = parts[len(parts)-1]
 	}
 
-	color := colorReset
-	switch level {
-	case "INFO":
-		color = colorInfo
-	case "ERROR":
-		color = colorError
-	case "DEBUG":
-		color = colorDebug
-	case "FATAL":
-		color = colorFatal
-	}
-
-	msg := fmt.Sprintf(format, args...)
-	log.Printf("%s[%s] [%s] [%s] -> %s%s", color, level, func2, func1, msg, colorReset)
-
-	if level == "FATAL" {
-		os.Exit(1)
-	}
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	return fmt.Sprintf("[%s] [%s] [%s -> %s] %s", timestamp, level, fn2, fn1, message)
 }
 
-func shortFuncName(full string) string {
-	if idx := strings.LastIndex(full, "."); idx != -1 {
-		return full[idx+1:]
-	}
-	return filepath.Base(full)
+func Infof(formatStr string, args ...interface{}) {
+	log.Println(format("INFO", fmt.Sprintf(formatStr, args...)))
 }
 
-func Infof(format string, args ...interface{})  {
-	logWithLevel("INFO", format, args...)
+func Errorf(formatStr string, args ...interface{}) {
+	log.Println(format("ERROR", fmt.Sprintf(formatStr, args...)))
 }
 
-func Errorf(format string, args ...interface{}) {
-	logWithLevel("ERROR", format, args...)
-}
-
-func Debugf(format string, args ...interface{}) {
-	logWithLevel("DEBUG", format, args...)
-}
-
-func Fatalf(format string, args ...interface{}) {
-	logWithLevel("FATAL", format, args...)
+func Fatalf(formatStr string, args ...interface{}) {
+	log.Println(format("FATAL", fmt.Sprintf(formatStr, args...)))
+	os.Exit(1)
 }
