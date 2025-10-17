@@ -33,11 +33,16 @@ func Load() (*Config, error) {
 	v.SetConfigName("config")
 	v.SetConfigType("yaml")
 	v.AddConfigPath(".")
+	v.AddConfigPath("./config")
+
+	v.SetDefault("server.port", 8080)
+	v.SetDefault("database.sslmode", "disable")
+	v.SetDefault("redis.db", 0)
+
+	v.SetEnvPrefix("APP")
 	v.AutomaticEnv()
 
-	if err := v.ReadInConfig(); err != nil {
-		return nil, err
-	}
+	if err := v.ReadInConfig(); err != nil {}
 
 	var cfg Config
 	if err := v.Unmarshal(&cfg); err != nil {
