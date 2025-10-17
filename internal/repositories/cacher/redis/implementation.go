@@ -4,15 +4,15 @@ import (
 	"context"
 	"time"
 
-	dbRepo "github.com/1tsandre/mini-go-backend/internal/repositories/database"
 	"github.com/redis/go-redis/v9"
+	"github.com/1tsandre/mini-go-backend/internal/repositories/cacher"
 )
 
 type RedisRepository struct {
 	client *redis.Client
 }
 
-func NewRedisRepository(client *redis.Client) dbRepo.CacheRepository {
+func NewRedisRepository(client *redis.Client) cacher.CacheRepository {
 	return &RedisRepository{
 		client: client,
 	}
