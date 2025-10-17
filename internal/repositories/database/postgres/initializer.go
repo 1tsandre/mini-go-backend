@@ -4,12 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/1tsandre/mini-go-backend/internal/config"
-	"github.com/1tsandre/mini-go-backend/pkg/logger"
 	_ "github.com/lib/pq"
+	"github.com/1tsandre/mini-go-backend/internal/config"
 )
 
-func NewPostgresConnection(cfg *config.Config) *sql.DB {
+func New(cfg *config.Config) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Database.Host,
@@ -22,13 +21,13 @@ func NewPostgresConnection(cfg *config.Config) *sql.DB {
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		logger.Fatalf("Failed to open PostgreSQL: %v", err)
+		return nil, fmt.Errorf("failed to open PostgreSQL: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		logger.Fatalf("Cannot ping PostgreSQL: %v", err)
+		db.Close()
+		return nil, fmt.Errorf("failed to ping PostgreSQL: %w", err)
 	}
 
-	logger.Infof("Connected to PostgreSQL")
-	return db
+	return db, nil
 }
