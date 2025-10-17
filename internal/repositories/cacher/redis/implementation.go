@@ -54,3 +54,7 @@ func (r *RedisRepository) HGet(ctx context.Context, key, field string) (string, 
 func (r *RedisRepository) HGetAll(ctx context.Context, key string) (map[string]string, error) {
 	return r.client.HGetAll(ctx, key).Result()
 }
+
+func (r *RedisRepository) Close() error {
+	return r.client.Close()
+}
