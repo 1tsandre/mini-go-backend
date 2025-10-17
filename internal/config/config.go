@@ -1,10 +1,8 @@
 package config
 
 import (
-	"os"
-	"strconv"
-
 	"github.com/spf13/viper"
+	"github.com/1tsandre/mini-go-backend/pkg/logger"
 )
 
 type Config struct {
@@ -35,23 +33,24 @@ func Load() (*Config, error) {
 	v.AddConfigPath(".")
 	v.AddConfigPath("./config")
 
+	// Default values
 	v.SetDefault("server.port", 8080)
+	v.SetDefault("database.port", 5432)
 	v.SetDefault("database.sslmode", "disable")
 	v.SetDefault("redis.db", 0)
 
 	v.SetEnvPrefix("APP")
 	v.AutomaticEnv()
 
-	if err := v.ReadInConfig(); err != nil {}
+	if err := v.ReadInConfig(); err != nil {
+		logger.Errorf("no config file found, using defaults and environment variables: %v", err)
+	} else {
+		logger.Infof("using config file: %s", v.ConfigFileUsed())
+	}
 
 	var cfg Config
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, err
-	}
-
-	if port := os.Getenv("PORT"); port != "" {
-		p, _ := strconv.Atoi(port)
-		cfg.Server.Port = p
 	}
 
 	return &cfg, nil
